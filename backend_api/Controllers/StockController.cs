@@ -34,7 +34,7 @@ namespace backend_api.Controllers  // 确保这是正确的命名空间
                 return BadRequest(ModelState);
             var stocks = await _stockRepository.GetAllAsync(query);
 
-            var stockDto = stocks.Select(s => s.ToStockDto());
+            var stockDto = stocks.Select(s => s.ToStockDto()).ToList();
 
             return Ok(stockDto);
 

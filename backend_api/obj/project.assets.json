@@ -6494,11 +6494,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/jinhongmai/Documents/GitHub/React_.Net_App/backend_api/backend_api.csproj",
+      "projectUniqueName": "/Users/jinhongmai/Documents/GitHub/Financial_Project/backend_api/backend_api.csproj",
       "projectName": "backend_api",
-      "projectPath": "/Users/jinhongmai/Documents/GitHub/React_.Net_App/backend_api/backend_api.csproj",
+      "projectPath": "/Users/jinhongmai/Documents/GitHub/Financial_Project/backend_api/backend_api.csproj",
       "packagesPath": "/Users/jinhongmai/.nuget/packages/",
-      "outputPath": "/Users/jinhongmai/Documents/GitHub/React_.Net_App/backend_api/obj/",
+      "outputPath": "/Users/jinhongmai/Documents/GitHub/Financial_Project/backend_api/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/jinhongmai/.nuget/NuGet/NuGet.Config"
@@ -6600,7 +6600,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.302/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.303/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
