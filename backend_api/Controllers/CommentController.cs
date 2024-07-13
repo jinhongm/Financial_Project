@@ -18,19 +18,22 @@ namespace backend_api.Controllers
     [Route("api/comment")]
     public class CommentController : ControllerBase
     {
-        private readonly ApplicationDBContext _context;
+        // private readonly ApplicationDBContext _context;
         private readonly ICommentRepository _commentRepository;
         private readonly IStockRepository _stockRepo;
 
         // 泛型的用法  UserManager是一个泛型类， AppUser是它的类型参数
         private readonly UserManager<AppUser> _userManager;
+
+        private readonly IFMPService _fmpService;
         public CommentController(ApplicationDBContext context, ICommentRepository commentRepository, IStockRepository stockRepo,
-        UserManager<AppUser> userManager)
+        UserManager<AppUser> userManager, IFMPService fmpService)
         {
-            _context = context;
+            // _context = context;
             _commentRepository = commentRepository;
             _stockRepo = stockRepo;
             _userManager = userManager;
+            _fmpService = fmpService;
         }
 
         [HttpGet]
@@ -55,21 +58,28 @@ namespace backend_api.Controllers
             return Ok(comment.ToCommentDto());
         }
 
-        [HttpPost("{stockId:int}")]
-        public async Task<IActionResult> Create([FromRoute] int stockId, [FromBody] CreateCommentDto commentDto)
+        [HttpPost("{symbol:alpha}")]
+        public async Task<IActionResult> Create([FromRoute] string symbol, [FromBody] CreateCommentDto commentDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);            
-            if (!await _stockRepo.StockExists(stockId)) {
-                return BadRequest("Stock Does Not Exist!");
+            var stock = await _stockRepo.GetBySymbolAsync(symbol);
+            if (stock == null){
+                stock = await _fmpService.FindStockBySymbolAsync(symbol);
+                if (stock == null){
+                    return BadRequest("Stock does not exist");
+                }
+                else{
+                    await _stockRepo.CreateAsync(stock);
+                }
             }
-// User is inherited from ClaimsPrincipal, which is defined in the Controller and ControllerBase.
-// Identity is used to provide middleware for registering, logging in, logging out, and identity management.
+            // User is inherited from ClaimsPrincipal, which is defined in the Controller and ControllerBase.
+            // Identity is used to provide middleware for registering, logging in, logging out, and identity management.
             var username = User.GetUsername();
             // Every HTTP Request will include a User
             var appUser = await _userManager.FindByNameAsync(username);
 
-            var commentModel = commentDto.ToCommentFromCreateDTO(stockId);
+            var commentModel = commentDto.ToCommentFromCreateDTO(stock.Id);
             commentModel.AppUserId = appUser.Id;
             commentModel = await _commentRepository.CreateAsync(commentModel);
             return CreatedAtAction(nameof(GetById), new { id = commentModel.Id }, commentModel.ToCommentDto());

@@ -19,12 +19,14 @@ namespace backend_api.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly IStockRepository _stockRepo;
         private readonly IPortfolioRepository _portfolioRepo;
+        private readonly IFMPService _fmpService;
         public PortfolioController(UserManager<AppUser> userManager,
-        IStockRepository stockRepo, IPortfolioRepository portfolioRepository)
+        IStockRepository stockRepo, IPortfolioRepository portfolioRepository, IFMPService fmpService)
         {
             _userManager = userManager;
             _stockRepo = stockRepo;
             _portfolioRepo = portfolioRepository;
+            _fmpService = fmpService;
         }
 
         [HttpGet]
@@ -45,10 +47,24 @@ namespace backend_api.Controllers
             var appUser = await _userManager.FindByNameAsync(username);
             var stock = await _stockRepo.GetBySymbolAsync(symbol);
 
+            if (stock == null)
+            {
+                stock = await _fmpService.FindStockBySymbolAsync(symbol);
+                if (stock == null)
+                {
+                    return BadRequest("Stock does not exists");
+                }
+                else
+                {
+                    await _stockRepo.CreateAsync(stock);
+                }
+            }
+
             if (stock == null) return BadRequest("Stock not found");
+
             var userPortfolio = await _portfolioRepo.GetUserPortfolio(appUser);
 
-            if(userPortfolio.Any(e => e.Symbol.ToLower() == symbol.ToLower())) return BadRequest("Can not add same stock to portfolio");
+            if (userPortfolio.Any(e => e.Symbol.ToLower() == symbol.ToLower())) return BadRequest("Cannot add same stock to portfolio");
 
             var portfolioModel = new Portfolio
             {
@@ -57,6 +73,7 @@ namespace backend_api.Controllers
             };
 
             await _portfolioRepo.CreateAsync(portfolioModel);
+
             if (portfolioModel == null)
             {
                 return StatusCode(500, "Could not create");
@@ -66,6 +83,7 @@ namespace backend_api.Controllers
                 return Created();
             }
         }
+
 
         [HttpDelete]
         [Authorize]

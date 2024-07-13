@@ -10,6 +10,7 @@ namespace backend_api.Interfaces
 {
     public interface IStockRepository
     {
+        // Stock 的 List Task是一个generic
         Task<List<Stock>> GetAllAsync(QueryObject query);
         
         Task<Stock?> GetBySymbolAsync(string symbol);
