@@ -9,6 +9,7 @@ using backend_api.Models;
 using backend_api.Data;
 using backend_api.Mappers;
 using backend_api.Extensions;
+using backend_api.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -37,11 +38,12 @@ namespace backend_api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        [Authorize]
+        public async Task<IActionResult> GetAll([FromQuery]CommentQueryObject commentQueryObject)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            var comments = await _commentRepository.GetAllAsync();
+            var comments = await _commentRepository.GetAllAsync(commentQueryObject);
             var commentDto = comments.Select( s => s.ToCommentDto());
             return Ok(commentDto);
         }

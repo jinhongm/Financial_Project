@@ -6,6 +6,7 @@ using backend_api.Data;
 using backend_api.Models;
 using backend_api.Interfaces;
 using backend_api.Dtos.Comment;
+using backend_api.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace backend_api.Repository
@@ -17,9 +18,17 @@ namespace backend_api.Repository
             _context = context;
         }
 
-        public async Task<List<Comment>> GetAllAsync()
+        public async Task<List<Comment>> GetAllAsync(CommentQueryObject commentQueryObject)
         {
-            return await _context.Comments.Include(a => a.AppUser).ToListAsync();
+            var comments = _context.Comments.Include(a => a.AppUser).AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(commentQueryObject.Symbol)){
+                comments = comments.Where(s=> s.Stock.Symbol == commentQueryObject.Symbol);
+            }
+            if (commentQueryObject.IsDescending == true){
+                comments = comments.OrderByDescending(c => c.CreatedOn);
+            }
+            return await comments.ToListAsync();
         }
 
         public async Task<Comment> GetByIdAsync(int id){
