@@ -1,5 +1,5 @@
 import React from 'react';
-import hero from './hero.png';
+import hero from './hero.jpg';
 import './Hero.css';
 
 interface Props {}
@@ -29,7 +29,7 @@ const Hero = (props: Props) => {
           </div>
         </div>
         <div className="mb-24 mx-auto md:w-180 md:px-10 lg:mb-0 lg:w-1/2">
-          <img src={hero} alt="" />
+          <img src={hero} alt="" style={{ width: '900px', height: '500px' }}/>
         </div>
       </div>
     </section>
